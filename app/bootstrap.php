@@ -60,21 +60,14 @@ $di->set('view', function () : View {
     return $view;
 });
 
-$apiGroup = new MicroCollection([
+$homeCollection = new MicroCollection([
     'namespace' => 'App\\Http\\Api\\Controllers',
 ]);
 
-$apiGroup->setHandler(new HomeController());
+$homeCollection->setHandler('App\\Http\\Api\\Controllers\\HomeController', true);
 
-$apiGroup->get(
-    '/one',
-    'one'
-);
-
-$apiGroup->get(
-    '/two',
-    'two'
-);
+$homeCollection->get('/one', 'one');
+$homeCollection->get('/two', 'two');
 
 $eventsManager = new Manager();
 $application = new Micro($di);
@@ -83,6 +76,6 @@ $application->get('/one', function() {
     echo ' function one ';
 });
 
-$application->mount($apiGroup);
+$application->mount($homeCollection);
 
 $application->handle();
