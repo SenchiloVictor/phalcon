@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\Middlewares;
 
+use Phalcon\Events\Event;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
 

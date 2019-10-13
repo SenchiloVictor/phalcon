@@ -2,8 +2,9 @@
 
 date_default_timezone_set('UTC');
 
-use App\Http\Api\Controllers\HomeController;
-use Phalcon\Events\Manager;
+use App\Http\Api\Middlewares\AuthMiddleware;
+use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Events\Event;
 use Phalcon\Mvc\Micro;
 use Phalcon\DI\FactoryDefault;
 use Phalcon\Loader;
@@ -60,6 +61,7 @@ $di->set('view', function () : View {
     return $view;
 });
 
+
 $homeCollection = new MicroCollection([
     'namespace' => 'App\\Http\\Api\\Controllers',
 ]);
@@ -69,12 +71,21 @@ $homeCollection->setHandler('App\\Http\\Api\\Controllers\\HomeController', true)
 $homeCollection->get('/one', 'one');
 $homeCollection->get('/two', 'two');
 
-$eventsManager = new Manager();
 $application = new Micro($di);
+$eventsManager = new EventsManager();
 
-$application->get('/one', function() {
-    echo ' function one ';
-});
+$eventsManager->attach(
+    'micro:beforeNotFound',
+    function (Event $event, $app) {
+        die ('404 micro:beforeNotFound');
+    }
+);
+
+
+$application->before(new AuthMiddleware());
+$eventsManager->attach('micro', new AuthMiddleware());
+
+$application->setEventsManager($eventsManager);
 
 $application->mount($homeCollection);
 
